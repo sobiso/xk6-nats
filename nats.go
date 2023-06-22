@@ -110,7 +110,7 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) error {
 			Data:  string(msg.Data),
 			Topic: msg.Subject,
 		}
-		fmt.Printf("MSG: %+v", msg.Data)
+		fmt.Printf("MSG: %s", msg.Data)
 		handler(message)
 	})
 
