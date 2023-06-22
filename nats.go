@@ -24,6 +24,7 @@ type Nats struct {
 	conn    *natsio.Conn
 	vu      modules.VU
 	exports map[string]interface{}
+	sub     *natsio.Subscription
 }
 
 // Ensure the interfaces are implemented correctly.
@@ -105,7 +106,7 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) error {
 		return fmt.Errorf("the connection is not valid")
 	}
 
-	_, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
+	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
 		message := Message{
 			Data:  string(msg.Data),
 			Topic: msg.Subject,
@@ -114,7 +115,12 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) error {
 		handler(message)
 	})
 
+	n.sub = sub
 	return err
+}
+
+func (n *Nats) Unsubscribe() {
+	_ = n.sub.Unsubscribe()
 }
 
 // Connects to JetStream and creates a new stream or updates it if exists already
