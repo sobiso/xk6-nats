@@ -26,8 +26,8 @@ type Nats struct {
 
 // Ensure the interfaces are implemented correctly.
 var (
-	_ modules.Instance = &Nats{}
 	_ modules.Module   = &RootModule{}
+	_ modules.Instance = &Nats{}
 )
 
 // NewModuleInstance implements the modules.Module interface and returns
