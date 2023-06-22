@@ -112,24 +112,29 @@ func (*Nats) Publish(conn *natsio.Conn, topic, message string) error {
 func (n *Nats) Subscribe(conn *natsio.Conn, topic string, handler MessageHandler) (*natsio.Subscription, error) {
 	fmt.Println("subscribe")
 	if conn == nil {
-		fmt.Println("no nats connection")
 		return nil, fmt.Errorf("the connection is not valid")
 	}
 	sub, err := conn.Subscribe(topic, func(msg *natsio.Msg) {
-		fmt.Printf("msg: %+v", msg)
-
-		//message := Message{
-		//	Data:      string(msg.Data),
-		//	DataBytes: msg.Data,
-		//	Topic:     msg.Subject,
-		//}
-		//
 		err := handler(string(msg.Data))
 		if err != nil {
-			fmt.Errorf("%v", err)
+			fmt.Printf("handler error, %s", err.Error())
 		}
-
 	})
+	//sub, err := conn.Subscribe(topic, func(msg *natsio.Msg) {
+	//	fmt.Printf("msg: %+v", msg)
+	//
+	//	//message := Message{
+	//	//	Data:      string(msg.Data),
+	//	//	DataBytes: msg.Data,
+	//	//	Topic:     msg.Subject,
+	//	//}
+	//	//
+	//	err := handler(string(msg.Data))
+	//	if err != nil {
+	//		return fmt.Errorf("%v", err)
+	//	}
+	//
+	//})
 	if err != nil {
 		return nil, err
 	}
