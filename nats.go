@@ -116,6 +116,7 @@ func (n *Nats) Subscribe(conn *natsio.Conn, topic string, handler MessageHandler
 
 	sub, err := conn.Subscribe(topic, func(msg *natsio.Msg) {
 		fmt.Printf("msg: %+v", msg)
+		
 		//message := Message{
 		//	Data:      string(msg.Data),
 		//	DataBytes: msg.Data,
