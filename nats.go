@@ -4,6 +4,7 @@ import (
 	"fmt"
 	natsio "github.com/nats-io/nats.go"
 	"go.k6.io/k6/js/modules"
+	"time"
 )
 
 func init() {
@@ -19,7 +20,8 @@ type Nats struct {
 	//conn    *natsio.Conn
 	vu modules.VU
 	//exports map[string]interface{}
-	//sub     *natsio.Subscription
+	sub     *natsio.Subscription
+	subSync *natsio.Subscription
 }
 
 // Ensure the interfaces are implemented correctly.
@@ -139,7 +141,22 @@ func (n *Nats) Subscribe(conn *natsio.Conn, topic string, handler MessageHandler
 	if err != nil {
 		return nil, err
 	}
+	n.sub = sub
 	return sub, nil
+}
+
+func (n *Nats) SubscribeSync(conn *natsio.Conn, topic string) (string, error) {
+	if conn == nil {
+		return "", fmt.Errorf("the connection is not valid")
+	}
+
+	sub, _ := conn.SubscribeSync(topic)
+	m, err := sub.NextMsg(1 * time.Second)
+	if err != nil {
+		return "", nil
+	}
+
+	return string(m.Data), nil
 }
 
 func (n *Nats) Unsubscribe(sub *natsio.Subscription) error {
