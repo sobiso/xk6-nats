@@ -1,4 +1,4 @@
-module github.com/obisoxk6-nats
+module github.com/sobiso/xk6-nats
 
 go 1.17
 
