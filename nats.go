@@ -115,14 +115,14 @@ func (n *Nats) Subscribe(conn *natsio.Conn, topic string, handler MessageHandler
 	}
 
 	sub, err := conn.Subscribe(topic, func(msg *natsio.Msg) {
-		message := Message{
-			Data:      string(msg.Data),
-			DataBytes: msg.Data,
-			Topic:     msg.Subject,
-		}
-		fmt.Printf("message: %s", message)
-
-		handler(message)
+		fmt.Printf("msg: %+v", msg)
+		//message := Message{
+		//	Data:      string(msg.Data),
+		//	DataBytes: msg.Data,
+		//	Topic:     msg.Subject,
+		//}
+		//
+		//handler(message)
 	})
 	if err != nil {
 		return nil, err
