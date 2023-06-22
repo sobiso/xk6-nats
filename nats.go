@@ -121,7 +121,7 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) error {
 			Data:  string(msg.Data),
 			Topic: msg.Subject,
 		}
-		fmt.Printf("handler: %s", handler)
+		fmt.Printf("message: %s", message)
 
 		handler(message)
 	})
