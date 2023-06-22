@@ -113,10 +113,10 @@ func (n *Nats) Subscribe(conn *natsio.Conn, topic string, handler MessageHandler
 	if conn == nil {
 		return nil, fmt.Errorf("the connection is not valid")
 	}
-
+	fmt.Println("subscribe")
 	sub, err := conn.Subscribe(topic, func(msg *natsio.Msg) {
 		fmt.Printf("msg: %+v", msg)
-		
+
 		//message := Message{
 		//	Data:      string(msg.Data),
 		//	DataBytes: msg.Data,
