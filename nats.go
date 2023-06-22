@@ -131,9 +131,9 @@ func (n *Nats) Subscribe(conn *natsio.Conn, topic string, handler MessageHandler
 	return sub, nil
 }
 
-func (n *Nats) Unsubscribe(sub *natsio.Subscription) {
+func (n *Nats) Unsubscribe(sub *natsio.Subscription) error {
 	fmt.Println("Unsubscribe")
-	_ = sub.Unsubscribe()
+	return sub.Unsubscribe()
 }
 
 //	func (n *Nats) Subscribe(topic string, handler MessageHandler) error {
