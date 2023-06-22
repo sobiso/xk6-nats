@@ -55,6 +55,7 @@ func (mi *Nats) Exports() modules.Exports {
 
 func (n *Nats) client(c goja.ConstructorCall) *goja.Object {
 	rt := n.vu.Runtime()
+	fmt.Println("New client init")
 
 	var cfg Configuration
 	err := rt.ExportTo(c.Argument(0), &cfg)
@@ -75,6 +76,7 @@ func (n *Nats) client(c goja.ConstructorCall) *goja.Object {
 
 	conn, err := natsOptions.Connect()
 	if err != nil {
+		fmt.Printf("ERR GO: %+v", err)
 		common.Throw(rt, err)
 	}
 
