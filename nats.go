@@ -115,6 +115,7 @@ func (n *Nats) Subscribe(conn *natsio.Conn, topic string, handler MessageHandler
 		return nil, fmt.Errorf("the connection is not valid")
 	}
 	sub, err := conn.Subscribe(topic, func(msg *natsio.Msg) {
+		n.vu.InitEnv().Logger.Debugf("msg rcv: %+v", msg)
 		err := handler(string(msg.Data))
 		if err != nil {
 			fmt.Printf("handler error, %s", err.Error())
