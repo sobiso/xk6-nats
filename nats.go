@@ -88,6 +88,7 @@ func (n *Nats) client(c goja.ConstructorCall) *goja.Object {
 
 func (n *Nats) Close() {
 	if n.conn != nil {
+		_ = n.sub.Unsubscribe()
 		n.conn.Close()
 	}
 }
