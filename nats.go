@@ -155,7 +155,7 @@ func (n *Nats) SubscribeSync(conn *natsio.Conn, topic string) (string, error) {
 	if err != nil {
 		return "", nil
 	}
-
+	fmt.Printf("m: %+v", m)
 	return string(m.Data), nil
 }
 
