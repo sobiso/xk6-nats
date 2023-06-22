@@ -150,12 +150,16 @@ func (n *Nats) SubscribeSync(conn *natsio.Conn, topic string) (string, error) {
 		return "", fmt.Errorf("the connection is not valid")
 	}
 
-	sub, _ := conn.SubscribeSync(topic)
+	sub, err := conn.SubscribeSync(topic)
+	if err != nil {
+		return "", err
+	}
 	m, err := sub.NextMsg(1 * time.Second)
 	if err != nil {
 		return "", nil
 	}
 	fmt.Printf("m: %+v", m)
+	fmt.Println("subscribed")
 	return string(m.Data), nil
 }
 
