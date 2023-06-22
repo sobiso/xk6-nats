@@ -77,7 +77,6 @@ func (n *Nats) client(c goja.ConstructorCall) *goja.Object {
 
 	conn, err := natsOptions.Connect()
 	if err != nil {
-		fmt.Printf("ERR GO: %+v", err)
 		common.Throw(rt, err)
 	}
 
@@ -111,7 +110,8 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) error {
 			Data:  string(msg.Data),
 			Topic: msg.Subject,
 		}
-		fmt.Printf("MSG: %s", msg.Data)
+		fmt.Printf("handler: %s", handler)
+
 		handler(message)
 	})
 
@@ -120,6 +120,7 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) error {
 }
 
 func (n *Nats) Unsubscribe() {
+	fmt.Println("Unsubscribe")
 	_ = n.sub.Unsubscribe()
 }
 
