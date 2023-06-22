@@ -124,7 +124,11 @@ func (n *Nats) Subscribe(conn *natsio.Conn, topic string, handler MessageHandler
 		//	Topic:     msg.Subject,
 		//}
 		//
-		//handler(message)
+		err := handler(string(msg.Data))
+		if err != nil {
+			fmt.Errorf("%v", err)
+		}
+
 	})
 	if err != nil {
 		return nil, err
@@ -267,4 +271,4 @@ type Message struct {
 	Topic     string
 }
 
-type MessageHandler func(Message)
+type MessageHandler func(string) error
