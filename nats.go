@@ -62,6 +62,7 @@ func (n *Nats) Open(host string) (*natsio.Conn, error) {
 		return nil, err
 	}
 
+	n.conn = conn
 	return conn, nil
 }
 
@@ -111,15 +112,16 @@ func (n *Nats) Publish(topic, message string) error {
 	return n.conn.Publish(topic, []byte(message))
 }
 
-func (n *Nats) Subscribe(natsClient *natsio.Conn, topic string, handler MessageHandler) error {
-	if natsClient == nil {
+func (n *Nats) Subscribe(topic string, handler MessageHandler) error {
+	if n.conn == nil {
 		return fmt.Errorf("the connection is not valid")
 	}
 
-	sub, err := natsClient.Subscribe(topic, func(msg *natsio.Msg) {
+	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
 		message := Message{
-			Data:  string(msg.Data),
-			Topic: msg.Subject,
+			Data:      string(msg.Data),
+			DataBytes: msg.Data,
+			Topic:     msg.Subject,
 		}
 		fmt.Printf("message: %s", message)
 
@@ -255,8 +257,9 @@ type Configuration struct {
 }
 
 type Message struct {
-	Data  string
-	Topic string
+	Data      string
+	DataBytes []byte
+	Topic     string
 }
 
 type MessageHandler func(Message)
