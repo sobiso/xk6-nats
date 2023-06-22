@@ -1,13 +1,10 @@
 package nats
 
 import (
-	"crypto/tls"
 	"fmt"
 	"time"
 
-	"github.com/dop251/goja"
 	natsio "github.com/nats-io/nats.go"
-	"go.k6.io/k6/js/common"
 	"go.k6.io/k6/js/modules"
 )
 
@@ -36,59 +33,72 @@ var (
 // NewModuleInstance implements the modules.Module interface and returns
 // a new instance for each VU.
 func (r *RootModule) NewModuleInstance(vu modules.VU) modules.Instance {
-	mi := &Nats{
-		vu:      vu,
-		exports: make(map[string]interface{}),
-	}
+	return &Nats{vu: vu}
+	//mi := &Nats{
+	//	vu: vu,
+	//	exports: make(map[string]interface{}),
+	//}
 
-	mi.exports["Nats"] = mi.client
+	//mi.exports["Nats"] = mi.client
 
-	return mi
+	//return mi
 }
 
 // Exports implements the modules.Instance interface and returns the exports
 // of the JS module.
 func (mi *Nats) Exports() modules.Exports {
 	return modules.Exports{
-		Named: mi.exports,
+		Default: mi,
 	}
+	//return modules.Exports{
+	//	Named: mi.exports,
+	//}
 }
 
-func (n *Nats) client(c goja.ConstructorCall) *goja.Object {
-	rt := n.vu.Runtime()
-	fmt.Println("New client init")
-
-	var cfg Configuration
-	err := rt.ExportTo(c.Argument(0), &cfg)
-	if err != nil {
-		common.Throw(rt, fmt.Errorf("Nats constructor expect Configuration as it's argument: %w", err))
-	}
-
+func (n *Nats) Open(host string) (*natsio.Conn, error) {
 	natsOptions := natsio.GetDefaultOptions()
-	natsOptions.Servers = cfg.Servers
-	if cfg.Unsafe {
-		natsOptions.TLSConfig = &tls.Config{
-			InsecureSkipVerify: true,
-		}
-	}
-	if cfg.Token != "" {
-		natsOptions.Token = cfg.Token
-	}
-
 	conn, err := natsOptions.Connect()
 	if err != nil {
-		common.Throw(rt, err)
+		return nil, err
 	}
 
-	return rt.ToValue(&Nats{
-		vu:   n.vu,
-		conn: conn,
-	}).ToObject(rt)
+	return conn, nil
 }
+
+//func (n *Nats) client(c goja.ConstructorCall) *goja.Object {
+//	rt := n.vu.Runtime()
+//	fmt.Println("New client init")
+//
+//	var cfg Configuration
+//	err := rt.ExportTo(c.Argument(0), &cfg)
+//	if err != nil {
+//		common.Throw(rt, fmt.Errorf("Nats constructor expect Configuration as it's argument: %w", err))
+//	}
+//
+//	natsOptions := natsio.GetDefaultOptions()
+//	natsOptions.Servers = cfg.Servers
+//	if cfg.Unsafe {
+//		natsOptions.TLSConfig = &tls.Config{
+//			InsecureSkipVerify: true,
+//		}
+//	}
+//	if cfg.Token != "" {
+//		natsOptions.Token = cfg.Token
+//	}
+//
+//	conn, err := natsOptions.Connect()
+//	if err != nil {
+//		common.Throw(rt, err)
+//	}
+//
+//	return rt.ToValue(&Nats{
+//		vu:   n.vu,
+//		conn: conn,
+//	}).ToObject(rt)
+//}
 
 func (n *Nats) Close() {
 	if n.conn != nil {
-		_ = n.sub.Unsubscribe()
 		n.conn.Close()
 	}
 }
