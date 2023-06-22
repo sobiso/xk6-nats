@@ -111,12 +111,12 @@ func (n *Nats) Publish(topic, message string) error {
 	return n.conn.Publish(topic, []byte(message))
 }
 
-func (n *Nats) Subscribe(topic string, handler MessageHandler) error {
-	if n.conn == nil {
+func (n *Nats) Subscribe(natsClient *natsio.Conn, topic string, handler MessageHandler) error {
+	if natsClient == nil {
 		return fmt.Errorf("the connection is not valid")
 	}
 
-	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
+	sub, err := natsClient.Subscribe(topic, func(msg *natsio.Msg) {
 		message := Message{
 			Data:  string(msg.Data),
 			Topic: msg.Subject,
@@ -129,6 +129,25 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) error {
 	n.sub = sub
 	return err
 }
+
+//func (n *Nats) Subscribe(topic string, handler MessageHandler) error {
+//	if n.conn == nil {
+//		return fmt.Errorf("the connection is not valid")
+//	}
+//
+//	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
+//		message := Message{
+//			Data:  string(msg.Data),
+//			Topic: msg.Subject,
+//		}
+//		fmt.Printf("message: %s", message)
+//
+//		handler(message)
+//	})
+//
+//	n.sub = sub
+//	return err
+//}
 
 func (n *Nats) Unsubscribe() {
 	fmt.Println("Unsubscribe")
