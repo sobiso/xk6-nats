@@ -55,7 +55,7 @@ func (mi *Nats) Exports() modules.Exports {
 	//}
 }
 
-func (n *Nats) Open(host string) (*natsio.Conn, error) {
+func (n *Nats) Open(host string) (*Nats, error) {
 	natsOptions := natsio.GetDefaultOptions()
 	conn, err := natsOptions.Connect()
 	if err != nil {
