@@ -1,6 +1,7 @@
 package nats
 
 import (
+	"fmt"
 	natsio "github.com/nats-io/nats.go"
 	"go.k6.io/k6/js/modules"
 )
@@ -94,19 +95,20 @@ func (n *Nats) Open(host string) (*natsio.Conn, error) {
 //	}).ToObject(rt)
 //}
 
-//func (n *Nats) Close() {
-//	if n.conn != nil {
-//		n.conn.Close()
-//	}
-//}
-//
-//func (n *Nats) Publish(topic, message string) error {
-//	if n.conn == nil {
-//		return fmt.Errorf("the connection is not valid")
-//	}
-//
-//	return n.conn.Publish(topic, []byte(message))
-//}
+func (*Nats) Close(conn *natsio.Conn) {
+	if conn != nil {
+		conn.Close()
+	}
+}
+
+func (*Nats) Publish(conn *natsio.Conn, topic, message string) error {
+	if conn == nil {
+		return fmt.Errorf("the connection is not valid")
+	}
+
+	return conn.Publish(topic, []byte(message))
+}
+
 //
 //func (n *Nats) Subscribe(topic string, handler MessageHandler) error {
 //	if n.conn == nil {
