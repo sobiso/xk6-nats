@@ -112,13 +112,12 @@ func (*Nats) Publish(conn *natsio.Conn, topic, message string) error {
 }
 
 func (n *Nats) Subscribe(conn *natsio.Conn, topic string, handler MessageHandler) (*natsio.Subscription, error) {
-	fmt.Println("subscribe")
 	if conn == nil {
 		return nil, fmt.Errorf("the connection is not valid")
 	}
 	sub, err := conn.Subscribe(topic, func(msg *natsio.Msg) {
-		n.vu.InitEnv().Logger.Debugf("msg rcv: %+v", msg)
-		err := handler(string(msg.Data))
+
+		err := handler(msg.Data)
 		if err != nil {
 			fmt.Printf("handler error, %s", err.Error())
 		}
@@ -145,22 +144,21 @@ func (n *Nats) Subscribe(conn *natsio.Conn, topic string, handler MessageHandler
 	return sub, nil
 }
 
-func (n *Nats) SubscribeSync(conn *natsio.Conn, topic string) (string, error) {
+func (n *Nats) SubscribeSync(conn *natsio.Conn, topic string) ([]byte, error) {
 	if conn == nil {
-		return "", fmt.Errorf("the connection is not valid")
+		return nil, fmt.Errorf("the connection is not valid")
 	}
 
 	sub, err := conn.SubscribeSync(topic)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	m, err := sub.NextMsg(1 * time.Second)
 	if err != nil {
-		return "", nil
+		return nil, nil
 	}
-	fmt.Printf("m: %+v", m)
 	fmt.Println("subscribed")
-	return string(m.Data), nil
+	return m.Data, nil
 }
 
 func (n *Nats) Unsubscribe(sub *natsio.Subscription) error {
@@ -298,4 +296,4 @@ type Message struct {
 	Topic     string
 }
 
-type MessageHandler func(string) error
+type MessageHandler func([]byte) error
