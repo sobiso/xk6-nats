@@ -157,6 +157,7 @@ func (n *Nats) SubscribeSync(conn *natsio.Conn, topic string) ([]byte, error) {
 	if err != nil {
 		return nil, nil
 	}
+	fmt.Printf("msg: %s", m.Data)
 	fmt.Println("subscribed")
 	return m.Data, nil
 }
