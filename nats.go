@@ -1,6 +1,7 @@
 package nats
 
 import (
+	"encoding/json"
 	"fmt"
 	natsio "github.com/nats-io/nats.go"
 	"go.k6.io/k6/js/modules"
@@ -53,6 +54,11 @@ func (n *Nats) Exports() modules.Exports {
 	//return modules.Exports{
 	//	Named: mi.exports,
 	//}
+}
+
+type MessageTopic struct {
+	Header map[string]string
+	Body   []byte
 }
 
 func (n *Nats) Open(host string) (*natsio.Conn, error) {
@@ -157,9 +163,14 @@ func (n *Nats) SubscribeSync(conn *natsio.Conn, topic string) ([]byte, error) {
 	if err != nil {
 		return nil, nil
 	}
-	fmt.Printf("msg: %s", m.Data)
-	fmt.Println("subscribed")
-	return m.Data, nil
+
+	var msg MessageTopic
+	err = json.Unmarshal(m.Data, &msg)
+	if err != nil {
+		return nil, err
+	}
+
+	return msg.Body, nil
 }
 
 func (n *Nats) Unsubscribe(sub *natsio.Subscription) error {
